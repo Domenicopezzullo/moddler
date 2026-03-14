@@ -15,7 +15,7 @@ struct Args {
     #[arg(index = 1)]
     projectname: String,
 
-    #[arg(short, long, default_value = "1.21.1")]
+    #[arg(long, default_value = "1.21.1")]
     mcversion: String,
 }
 
@@ -74,10 +74,7 @@ fn setup_fabric(project_name: &str, mcversion: &str) -> io::Result<()> {
     )?;
 
     if !status.success() {
-        return Err(io::Error::new(
-            io::ErrorKind::Other,
-            "git clone failed for Fabric",
-        ));
+        return Err(io::Error::other("git clone failed for Fabric"));
     }
 
     println!("\nFabric project cloned successfully!");
@@ -89,7 +86,7 @@ fn setup_fabric(project_name: &str, mcversion: &str) -> io::Result<()> {
 
 fn neoforge_repo_name(mcversion: &str) -> String {
     if mcversion.starts_with("1.21") {
-        format!("MDK-1.21-NeoGradle")
+        "MDK-1.21-NeoGradle".to_string()
     } else if mcversion.starts_with("1.20") {
         "MDK-1.20.6-NeoGradle".to_string()
     } else {
@@ -97,7 +94,7 @@ fn neoforge_repo_name(mcversion: &str) -> String {
             "Warning: no specific NeoForge MDK known for {}, trying 1.21",
             mcversion
         );
-        "MDK-1.21-NeoGradle".to_string()
+        format!("MDK-{}-NeoGradle", mcversion)
     }
 }
 
@@ -108,10 +105,10 @@ fn setup_neoforge(project_name: &str, mcversion: &str) -> io::Result<()> {
     let status = run_git_clone(&url, None, project_name)?;
 
     if !status.success() {
-        return Err(io::Error::new(
-            io::ErrorKind::Other,
-            format!("couldnt create project for NeoForge ({})", url),
-        ));
+        return Err(io::Error::other(format!(
+            "couldnt create project for NeoForge ({})",
+            url
+        )));
     }
 
     println!("\nNeoForge project cloned successfully!");
